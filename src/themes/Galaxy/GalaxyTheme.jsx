@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Particles from 'react-tsparticles';
+import { loadStarsPreset } from 'tsparticles-preset-stars';
 import data from '../../data.json';
 import './styles.css';
 
 // Assets imports
-import nebulaImg from './assets/nebula1.png';
-
 import astronautImg from './assets/astronaut.png';
 import spaceshipImg from './assets/spaceship.png';
-
 import planet1Img from './assets/planet1.png';
 import planet2Img from './assets/planet2.png';
 import planet3Img from './assets/planet3.png';
@@ -31,94 +30,136 @@ const modalVariants = {
   exit: { opacity: 0, scale: 0.85, transition: { duration: 0.3 } },
 };
 
-// Star component with twinkle animation delay
-function Star({ x, y, size, twinkleDelay }) {
+function StarfieldBackground() {
+  const particlesInit = useCallback(async (engine) => {
+    await loadStarsPreset(engine);
+  }, []);
+
   return (
-    <div
-      className="star"
-      style={{
-        top: `${y}%`,
-        left: `${x}%`,
-        width: size,
-        height: size,
-        animationDelay: `${twinkleDelay}s`,
+    <Particles
+      id="tsparticles"
+      init={particlesInit}
+      options={{
+        preset: 'stars',
+        background: {
+          color: {
+            value: "#0b0d17", // Match galaxy background color
+          },
+        },
+        fullScreen: {
+          enable: true,
+          zIndex: 0,
+        },
+        particles: {
+          number: {
+            value: 120,
+            density: {
+              enable: true,
+              area: 800,
+            },
+          },
+          color: { value: "#bfcfff" },
+          opacity: {
+            value: 0.5,
+            random: { enable: true, minimumValue: 0.1 },
+            animation: {
+              enable: true,
+              speed: 0.5,
+              minimumValue: 0.1,
+              sync: false,
+            },
+          },
+          size: {
+            value: 2,
+            random: { enable: true, minimumValue: 0.5 },
+          },
+          move: {
+            enable: false,
+          },
+          twinkle: {
+            particles: {
+              enable: true,
+              frequency: 0.02,
+              opacity: 1,
+            },
+            lines: {
+              enable: false,
+            },
+          },
+        },
+        interactivity: {
+          detectsOn: "canvas",
+          events: {
+            onHover: { enable: false },
+            onClick: { enable: false },
+          },
+        },
+        emitters: [
+          {
+            direction: "top-right",
+            spawnColor: {
+              value: "#ffffff",
+              animation: { enable: true, speed: 400, sync: true },
+            },
+            rate: { quantity: 1, delay: 7 },
+            size: { width: 0, height: 0 },
+            life: { count: 1, duration: 2, delay: 3 },
+            position: { x: 0, y: 100 },
+            particles: {
+              shape: "line",
+              size: {
+                value: 150,
+                animation: {
+                  enable: true,
+                  speed: 220,
+                  minimumValue: 50,
+                  sync: true,
+                  startValue: "max",
+                  destroy: "min",
+                },
+              },
+              move: {
+                direction: "top-right",
+                speed: 400,
+                straight: true,
+                outModes: { default: "destroy" },
+              },
+              trail: { enable: true, length: 60, fillColor: "#0b0d17" },
+            },
+          },
+        ],
       }}
     />
   );
 }
 
-function GalaxyBackground() {
-  const [stars] = useState(() =>
-    Array.from({ length: 100 }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: `${1 + Math.random() * 1.5}px`,
-      delay: Math.random() * 5,
-    }))
-  );
-
-  const [shootingStar, setShootingStar] = useState(null);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShootingStar({
-        top: Math.random() * 80 + 10,
-        left: -5,
-      });
-      setTimeout(() => setShootingStar(null), 1500);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="galaxy-background">
-      {/* Single nebula image */}
-      <img src={nebulaImg} alt="Nebula" className="nebula-layer" />
-
-      {/* Test stars */}
-        <div className="star" style={{ top: '10%', left: '10%', width: '3px', height: '3px', animationDelay: '0s' }} />
-        <div className="star" style={{ top: '40%', left: '50%', width: '2px', height: '2px', animationDelay: '1s' }} />
-        <div className="star" style={{ top: '70%', left: '80%', width: '1.5px', height: '1.5px', animationDelay: '2s' }} />
-
-        {stars.map((star, i) => (
-          <Star key={i} x={star.x} y={star.y} size={star.size} twinkleDelay={star.delay} />
-        ))}
-
-      {/* Stars */}
-      {stars.map((star, i) => (
-        <Star key={i} x={star.x} y={star.y} size={star.size} twinkleDelay={star.delay} />
-      ))}
-
-      {/* Shooting star */}
-      <AnimatePresence>
-        {shootingStar && (
-          <motion.div
-            className="shooting-star"
-            initial={{ top: shootingStar.top + '%', left: shootingStar.left + '%' }}
-            animate={{ left: '120%', top: shootingStar.top - 10 + '%' }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
-          />
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 function Modal({ isOpen, onClose, title, content }) {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+  React.useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
   }, [isOpen]);
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="modal-title">
-          <motion.div className="modal-content" variants={modalVariants} initial="hidden" animate="visible" exit="exit" onClick={e => e.stopPropagation()}>
+        <motion.div
+          className="modal-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <motion.div
+            className="modal-content"
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h2 id="modal-title">{title}</h2>
             <div className="modal-scrollable-content">{content}</div>
             <button className="modal-close" onClick={onClose} aria-label="Close modal">
@@ -150,7 +191,7 @@ function Planet({ planetData, onClick }) {
       tabIndex={0}
       role="button"
       aria-label={`Open ${planetData.label} section`}
-      onKeyDown={e => {
+      onKeyDown={(e) => {
         if (e.key === 'Enter') onClick();
       }}
     >
@@ -184,7 +225,10 @@ function Astronaut({ introContent, onContactClick }) {
   const [dialogVisible, setDialogVisible] = useState(false);
 
   return (
-    <div className="astronaut-container" style={{ top: '50%', left: '35%', transform: 'translate(-50%, -50%)', position: 'absolute', zIndex: 20 }}>
+    <div
+      className="astronaut-container"
+      style={{ top: '50%', left: '35%', transform: 'translate(-50%, -50%)', position: 'absolute', zIndex: 20 }}
+    >
       <motion.img
         src={astronautImg}
         alt="Floating astronaut"
@@ -213,24 +257,12 @@ function Astronaut({ introContent, onContactClick }) {
         tabIndex={0}
         role="button"
         aria-label="Open contact modal"
-        onKeyDown={e => {
+        onKeyDown={(e) => {
           if (e.key === 'Enter') onContactClick();
         }}
         animate={{ y: [0, -10, 0] }}
         transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
       />
-
-      {/* <svg className="light-trail" aria-hidden="true" width="500" height="500" fill="none" xmlns="http://www.w3.org/2000/svg" style={{position:'absolute', top: 0, left: 0, pointerEvents: 'none', userSelect: 'none', zIndex: 15}}>
-        <path
-          d="M175 250 Q 320 300 450 500"
-          stroke="#a5b1ffaa"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg> */}
-
     </div>
   );
 }
@@ -239,17 +271,34 @@ function ThemeSwitcher({ currentTheme, themes, onThemeSelect }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="theme-switcher" onClick={() => setOpen(!open)} tabIndex={0} role="button" aria-label="Open theme switcher" onKeyDown={e => e.key === 'Enter' && setOpen(!open)}>
+    <div
+      className="theme-switcher"
+      onClick={() => setOpen(!open)}
+      tabIndex={0}
+      role="button"
+      aria-label="Open theme switcher"
+      onKeyDown={(e) => e.key === 'Enter' && setOpen(!open)}
+    >
       <div className="glowing-globe" />
       <AnimatePresence>
         {open && (
           <motion.ul className="theme-dropdown" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-            {themes.filter(t => t !== currentTheme).map(t => (
-              <li key={t} tabIndex={0} onClick={() => { onThemeSelect(t); setOpen(false); }} onKeyDown={e => e.key === 'Enter' && (onThemeSelect(t), setOpen(false))}>
-                <div className="theme-preview" />
-                {t}
-              </li>
-            ))}
+            {themes
+              .filter((t) => t !== currentTheme)
+              .map((t) => (
+                <li
+                  key={t}
+                  tabIndex={0}
+                  onClick={() => {
+                    onThemeSelect(t);
+                    setOpen(false);
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && (onThemeSelect(t), setOpen(false))}
+                >
+                  <div className="theme-preview" />
+                  {t}
+                </li>
+              ))}
           </motion.ul>
         )}
       </AnimatePresence>
@@ -262,11 +311,11 @@ export default function GalaxyTheme() {
   const [modalSection, setModalSection] = useState(null);
   const [currentTheme] = useState('Galaxy');
 
-  const onThemeSelect = themeName => {
+  const onThemeSelect = (themeName) => {
     alert(`Theme switch to ${themeName} - implement routing or dynamic import for real app.`);
   };
 
-  const openModalForSection = sectionKey => {
+  const openModalForSection = (sectionKey) => {
     setModalSection(sectionKey);
     setModalOpen(true);
   };
@@ -283,10 +332,20 @@ export default function GalaxyTheme() {
       const contact = data.contact;
       return (
         <div className="contact-content">
-          <p>Email: <a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+          <p>
+            Email: <a href={`mailto:${contact.email}`}>{contact.email}</a>
+          </p>
           <p>Phone: {contact.phone}</p>
           <p>Socials:</p>
-          <ul>{Object.entries(contact.socials).map(([key, link]) => (<li key={key}><a href={link} target="_blank" rel="noreferrer">{key}</a></li>))}</ul>
+          <ul>
+            {Object.entries(contact.socials).map(([key, link]) => (
+              <li key={key}>
+                <a href={link} target="_blank" rel="noreferrer">
+                  {key}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       );
     }
@@ -353,13 +412,20 @@ export default function GalaxyTheme() {
 
   return (
     <div className="galaxy-theme-container">
-      <GalaxyBackground />
+      {/* Starfield Background */}
+      <StarfieldBackground />
+
       <ThemeSwitcher currentTheme={currentTheme} themes={data.themes} onThemeSelect={onThemeSelect} />
       <Astronaut introContent={data.intro} onContactClick={() => openModalForSection('contact')} />
-      {planets.map(planet => (
+      {planets.map((planet) => (
         <Planet key={planet.key} planetData={planet} onClick={() => openModalForSection(planet.modalKey)} />
       ))}
-      <Modal isOpen={modalOpen} onClose={closeModal} title={modalSection ? modalSection.charAt(0).toUpperCase() + modalSection.slice(1) : ''} content={modalContent()} />
+      <Modal
+        isOpen={modalOpen}
+        onClose={closeModal}
+        title={modalSection ? modalSection.charAt(0).toUpperCase() + modalSection.slice(1) : ''}
+        content={modalContent()}
+      />
     </div>
   );
 }
