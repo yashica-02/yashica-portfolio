@@ -331,11 +331,11 @@ export default function GalaxyTheme() {
     { key: 'about', label: 'About', image: planet1Img, position: { top: '15%', left: '75%' }, rotationDuration: 50, modalKey: 'about' },
     { key: 'skills', label: 'Skills', image: planet2Img, position: { top: '50%', left: '85%' }, rotationDuration: 65, modalKey: 'skills' },
     { key: 'experience', label: 'Experience', image: planet3Img, position: { top: '77%', left: '75%' }, rotationDuration: 80, modalKey: 'experience' },
-    { key: 'projects', label: 'Projects', image: planet4Img, position: { top: '80%', left: '50%' }, rotationDuration: 70, modalKey: 'projects' },
+    { key: 'projects', label: 'Projects', image: planet4Img, position: { top: '75%', left: '50%' }, rotationDuration: 70, modalKey: 'projects' },
     { key: 'education', label: 'Education', image: planet5Img, position: { top: '50%', left: '7%' }, rotationDuration: 60, modalKey: 'education' },
     { key: 'certifications', label: 'Certifications', image: planet6Img, position: { top: '12%', left: '20%' }, rotationDuration: 90, modalKey: 'certifications' },
     { key: 'extraCurricular', label: 'Extra-Curricular', image: planet7Img, position: { top: '75%', left: '25%' }, rotationDuration: 55, modalKey: 'extraCurricular' },
-    { key: 'stats', label: 'Stats', image: planet8Img, position: { top: '10%', left: '50%' }, rotationDuration: 75, modalKey: 'stats' },
+    { key: 'stats', label: 'Stats', image: planet8Img, position: { top: '7%', left: '50%' }, rotationDuration: 75, modalKey: 'stats' },
   ];
 
   return (

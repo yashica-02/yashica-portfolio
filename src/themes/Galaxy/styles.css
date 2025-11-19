@@ -84,7 +84,7 @@ body, html, #root {
 .spaceship {
   position: absolute;
   width: 400px;
-  bottom: -120px;
+  bottom: -100px;
   left: 250px;
   cursor: pointer;
   filter: drop-shadow(0 0 10px #d883ffcc);
